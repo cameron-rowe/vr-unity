@@ -39,13 +39,6 @@ public class Painter : MonoBehaviour
         
         transform.localPosition = pos;//new Vector3(sixdof.Position.x * 6.5f, (sixdof.Position.y - 2.0f) * 6.5f, (sixdof.Position.z - 2.0f) * -6.5f);
 
-        
-
-        //var mat = Matrix4x4.TRS(Vector3.zero, sixdof.Rotation, new Vector3(1, 1, 1));
-        //var transpose = mat.transpose;
-
-        //var quat = transpose.ToRotationQuaternion();//transpose.ToRotationQuaternion();
-
         transform.localRotation = sixdof.Rotation;//new Quaternion(-sixdof.Rotation.x, sixdof.Rotation.z, sixdof.Rotation.y, sixdof.Rotation.w);//new Quaternion(sixdof.Rotation.z, sixdof.Rotation.y, sixdof.Rotation.x, sixdof.Rotation.w));
 
         //transform.localPosition.z += 10;
