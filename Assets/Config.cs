@@ -16,6 +16,8 @@ public class Config : MonoBehaviour
     private Dictionary<string, AnalogCallback> analogCallbacks = new Dictionary<string, AnalogCallback>();
     private Dictionary<string, SixdofCallback> sixdofCallbacks = new Dictionary<string, SixdofCallback>();
 
+    private Dictionary<string, LuaTable> machines = new Dictionary<string, LuaTable>();
+
     void Start() {
         state.DoString(string.Format("HOSTNAME = '{0}'", System.Environment.MachineName));
 
@@ -83,6 +85,14 @@ public class Config : MonoBehaviour
                 sixdofCallbacks.Add(device, callback);
             }
         }
+
+        // machines
+        var luaMachines = state["machines"] as LuaTable;
+        //var self = machines["self"] as LuaTable;
+
+        foreach(string machine in luaMachines.Keys) {
+            machines[machine] = luaMachines[machine] as LuaTable;
+        }
     }
 
     public bool GetButtonValue(string device, int channel) {
@@ -95,5 +105,9 @@ public class Config : MonoBehaviour
 
     public Sixdof GetSixdofValue(string device, int channel) {
         return sixdofCallbacks[device](channel);
+    }
+
+    public Dictionary<string, object> GetMachineConfiguration(string machine) {
+        return state.GetTableDict(machines[machine]).ToDictionary(v => v.Key.ToString(), v => v.Value);
     }
 }
