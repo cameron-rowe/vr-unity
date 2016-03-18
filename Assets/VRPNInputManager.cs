@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public class VRPNInputManager : MonoBehaviour
 {
@@ -12,8 +15,13 @@ public class VRPNInputManager : MonoBehaviour
     public Dictionary<string, Sixdof> SixdofValues = new Dictionary<string, Sixdof>();
 
     private Config config;
+	private NetworkManager networkManager;
+
+	private InputData data;
     // Use this for initialization
     void Start() {
+
+		//data = new InputData();
 
         ButtonMap.Add("clear", "WiiMote0[0]"); // Home button
         ButtonMap.Add("paint", "WiiMote0[3]"); // A button
@@ -39,6 +47,8 @@ public class VRPNInputManager : MonoBehaviour
         }
 
         config = FindObjectOfType<Config>();
+		networkManager = new NetworkManager();
+		networkManager.Start(config);
     }
 
     // Update is called once per frame
@@ -46,25 +56,68 @@ public class VRPNInputManager : MonoBehaviour
         string device;
         int channel;
 
-        foreach(var button in ButtonMap.Values) {
-            GetDeviceAndChannel(button, out device, out channel);
-            ButtonValues[button] = config.GetButtonValue(device, channel);
-        }
+		if(config.IsMaster) {
+			foreach(var button in ButtonMap.Values) {
+				GetDeviceAndChannel(button, out device, out channel);
+				ButtonValues[button] = config.GetButtonValue(device, channel);
+			}
 
-        foreach(var analog in AnalogMap.Values) {
-            GetDeviceAndChannel(analog, out device, out channel);
-            AnalogValues[analog] = config.GetAnalogValue(device, channel);
-        }
+			foreach(var analog in AnalogMap.Values) {
+				GetDeviceAndChannel(analog, out device, out channel);
+				AnalogValues[analog] = config.GetAnalogValue(device, channel);
+			}
 
-        foreach(var sixdof in SixdofMap.Values) {
-            GetDeviceAndChannel(sixdof, out device, out channel);
-            SixdofValues[sixdof] = config.GetSixdofValue(device, channel);
-        }
-
-        if(Input.GetKeyDown(KeyCode.Escape)) {
-            Application.Quit();
-        }
+			foreach(var sixdof in SixdofMap.Values) {
+				GetDeviceAndChannel(sixdof, out device, out channel);
+				SixdofValues[sixdof] = config.GetSixdofValue(device, channel);
+			}
+		}
     }
+
+	public void Sync() {
+//		if(config.IsMaster) {
+//			for(int i = 0; i < config.NumMachines - 1; i++) {
+//				var packet = networkManager.SyncSocket.Recv();
+//
+//				if(packet != string.Empty) {
+//					networkManager.SyncSocket.Send(packet);
+//				}
+//			}
+//
+//			var dataPacket = data.SerializeObject();
+//			networkManager.PubsubSocket.Send(dataPacket);
+//		} 
+//		else {
+//			var packet = " ";
+//			networkManager.SyncSocket.Send(packet);
+//			packet = networkManager.SyncSocket.Recv();
+//		}
+
+		if(config.IsMaster) {
+			var data = new InputData {
+				buttonValues = ButtonValues,
+				analogValues = AnalogValues,
+				sixdofValues = SixdofValues,
+				terminated = CaVR.Terminated
+			};
+
+			var serialized = data.SerializeObject();
+			networkManager.PubsubSocket.Send(serialized);
+		} 
+		else {
+			var packet = networkManager.PubsubSocket.Recv();
+			var data = SocketExtensions.DeserializeObject<InputData>(packet);
+
+			ButtonValues = data.buttonValues;
+			AnalogValues = data.analogValues;
+			SixdofValues = data.sixdofValues;
+		}
+	}
+
+	void OnDestroy() {
+		networkManager.Destroy();
+		networkManager = null;
+	}
 
     public bool GetButtonValue(string name) {
         return ButtonValues[ButtonMap[name]];
@@ -84,4 +137,20 @@ public class VRPNInputManager : MonoBehaviour
         var channelStr = split[1].Replace("]", string.Empty);
         channel = int.Parse(channelStr);
     }
+
+	[Serializable]
+	public struct InputData {
+		
+		//[SerializableAttribute]
+		public Dictionary<string, bool> buttonValues;
+
+		//[SerializableAttribute]
+		public Dictionary<string, float> analogValues;
+
+		//[SerializableAttribute]
+		public Dictionary<string, Sixdof> sixdofValues;
+
+		//[SerializableAttribute]
+		public bool terminated;
+	}
 }

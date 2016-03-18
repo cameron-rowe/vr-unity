@@ -1,12 +1,16 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System;
+using System.Runtime.Serialization;
 
+[Serializable]
 public struct Sixdof
 {
+	//[SerializableAttribute]
     public Vector3 Position {
         get; set;
     }
 
+	//[SerializableAttribute]
     public Quaternion Rotation {
         get; set;
     }
@@ -40,6 +44,11 @@ public struct Sixdof
     }
 
     public override string ToString() {
-        return string.Format("sixdof[pos={0}, rot={1}", Position, Rotation);
+        return string.Format("sixdof[pos={0}, rot={1}]", Position, Rotation);
     }
+
+	public static readonly Sixdof Empty = new Sixdof {
+		Position = Vector3.zero,
+		Rotation = Quaternion.identity
+	};
 }

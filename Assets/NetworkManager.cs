@@ -1,37 +1,53 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
+using System.Threading;
 
 using NetMQ;
 using NetMQ.Sockets;
 
-public class NetworkManager : MonoBehaviour {
+public class NetworkManager {
 
-    private bool isMaster = false;
+	public NetMQSocket SyncSocket { get; private set; }
+	public NetMQSocket PubsubSocket { get; private set; }
 
-    private NetMQSocket socket;
-
+	private Config config;
 	// Use this for initialization
-	void Start () {
+	public void Start(Config c) {
         AsyncIO.ForceDotNet.Force();
 
+		config = c;
+
+		var masterKey = string.Empty;
 	    foreach(var arg in Environment.GetCommandLineArgs()) {
-            if(arg == "-master") {
-                isMaster = true;
+			if(arg.Contains("--cavr_master=")) {
+				masterKey = arg.Split('=')[1];
                 break;
             }
         }
-
-        if(isMaster) {
-            socket = new PublisherSocket();
+			
+			
+		if(config.IsMaster) {
+			var host = config.GetLuaStateValue("machines.master.address").ToString();
+			SyncSocket = new ResponseSocket(host);
+			PubsubSocket = new PublisherSocket(host);
         }
 
         else {
-            socket = new SubscriberSocket();
+			SyncSocket = new RequestSocket(masterKey);
+			PubsubSocket = new SubscriberSocket(masterKey);
+
+			(PubsubSocket as SubscriberSocket).Subscribe("pubsub");
         }
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	public void Update() {
 	
+	}
+
+	public void Destroy() {
+		SyncSocket.Dispose();
+		PubsubSocket.Dispose();
+		SyncSocket = null;
+		PubsubSocket = null;
 	}
 }
