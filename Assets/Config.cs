@@ -8,7 +8,7 @@ public delegate bool ButtonCallback(int channel);
 public delegate float AnalogCallback(int channel);
 public delegate Sixdof SixdofCallback(int channel);
 
-public class Config : MonoBehaviour
+public class Config
 {
     private Lua state = new Lua();
 
@@ -21,7 +21,7 @@ public class Config : MonoBehaviour
 	public bool IsMaster { get; private set; }
 	public int NumMachines { get; private set; }
 
-    void Awake() {
+    public void Init() {
         state.DoString(string.Format("HOSTNAME = '{0}'", System.Environment.MachineName));
 
         Debug.Log(string.Format("HOSTNAME = '{0}'", state["HOSTNAME"]));
@@ -33,6 +33,8 @@ public class Config : MonoBehaviour
 		var luaMachines = state["machines"] as LuaTable;
 		NumMachines = luaMachines.Values.Count;
 		var master = luaMachines["master"] as LuaTable;
+
+		Debug.Log(string.Format("Machines: {0}  Master: {1}", luaMachines, master));
 
 		IsMaster = System.Convert.ToString(master["hostname"]).Contains(System.Environment.MachineName);
 

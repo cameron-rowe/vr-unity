@@ -19,7 +19,9 @@ public class Painter : MonoBehaviour
 	// Use this for initialization
 	void Start () {
 		lrMat = new Material(Shader.Find("Particles/Additive"));
-        inputManager = FindObjectOfType<VRPNInputManager>();
+
+		var cavr = FindObjectOfType<CaVR>();
+		inputManager = cavr.InputManger;
 	}
 	
 	// Update is called once per frame

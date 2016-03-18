@@ -4,7 +4,7 @@ using System;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-public class VRPNInputManager : MonoBehaviour
+public class VRPNInputManager
 {
     public Dictionary<string, string> ButtonMap = new Dictionary<string, string>();
     public Dictionary<string, string> AnalogMap = new Dictionary<string, string>();
@@ -19,7 +19,7 @@ public class VRPNInputManager : MonoBehaviour
 
 	private InputData data;
     // Use this for initialization
-    void Start() {
+	public void Start(Config c) {
 
 		//data = new InputData();
 
@@ -46,9 +46,9 @@ public class VRPNInputManager : MonoBehaviour
             SixdofValues.Add(sixdof, new Sixdof());
         }
 
-        config = FindObjectOfType<Config>();
-		networkManager = new NetworkManager();
-		networkManager.Start(config);
+		config = c;
+		//networkManager = new NetworkManager();
+		//networkManager.Start(config);
     }
 
     // Update is called once per frame

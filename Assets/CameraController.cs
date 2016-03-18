@@ -7,7 +7,8 @@ public class CameraController : MonoBehaviour {
     private Camera cam;
 	// Use this for initialization
 	void Start () {
-        inputManager = FindObjectOfType<VRPNInputManager>();
+		var cavr = FindObjectOfType<CaVR>();
+		inputManager = cavr.InputManger;//FindObjectOfType<VRPNInputManager>();
         cam = GetComponent<Camera>();
 	}
 	

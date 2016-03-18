@@ -10,17 +10,20 @@ public class CaVR : MonoBehaviour {
 
 	public static bool Terminated { get; private set; }
 	private Config config;
-	private VRPNInputManager inputManger;
+	public VRPNInputManager InputManger { get; private set; }
 
 	private Thread networkThread;
 	// Use this for initialization
 	void Start() {
 		Terminated = false;
-		config = FindObjectOfType<Config>();
-		inputManger = FindObjectOfType<VRPNInputManager>();
+		config = new Config();
+		config.Init();
+		InputManger = new VRPNInputManager();
+		InputManger.Start(config);
 
+		UnityEngine.Debug.Log(Environment.GetCommandLineArgs()[0]);
 		if(config.IsMaster) {
-            if(Environment.OSVersion.Platform == PlatformID.MacOSX || Environment.OSVersion.Platform == PlatformID.MacOSX) { 
+			if(!Application.isEditor || Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX) { 
 			    var machines = config.GetLuaStateValue("machines") as LuaTable;
                 foreach(var machineKey in machines.Keys) {
                     var machine = machineKey.ToString();
@@ -33,7 +36,8 @@ public class CaVR : MonoBehaviour {
                     var cwd = Environment.CurrentDirectory;
 
                     var command = new StringBuilder();
-                    command.Append("cd ").Append(cwd).Append(" &&");
+					command.Append(ssh).Append(' ');
+                    command.Append("'cd ").Append(cwd).Append(" && export DISPLAY=:0 &&");
 
                     foreach(var arg in Environment.GetCommandLineArgs()) {
                         command.Append(' ');
@@ -41,6 +45,12 @@ public class CaVR : MonoBehaviour {
                     }
 
                     command.Append(" --cavr_master=").Append(config.GetLuaStateValue("machines.master.address").ToString());
+
+					command.Append("'");
+
+					var commandStr = command.ToString();
+
+					UnityEngine.Debug.Log("Command: " + commandStr);
 
                     var sshOptions = new ProcessStartInfo("ssh", command.ToString());
                     var process = new Process();
@@ -50,7 +60,7 @@ public class CaVR : MonoBehaviour {
                         UnityEngine.Debug.LogError("Unable to launch SSH");
                     }
 
-                    Thread.Sleep(1000 * 10);
+                    Thread.Sleep(1000 * 2);
                 }
 			}
             else {
@@ -72,9 +82,9 @@ public class CaVR : MonoBehaviour {
 			}
 		});
 
-		networkThread.Start();
+		//networkThread.Start();
 	}
-	
+
 	// Update is called once per frame
 	void Update() {
 	
@@ -89,6 +99,7 @@ public class CaVR : MonoBehaviour {
 	}
 
 	private void SyncInput() {
-		inputManger.Sync();
+		InputManger.Sync();
 	}
+		
 }

@@ -6,7 +6,8 @@ public class PlayerController : MonoBehaviour {
     private VRPNInputManager inputManager;
 	// Use this for initialization
 	void Start () {
-        inputManager = FindObjectOfType<VRPNInputManager>();
+		var cavr = FindObjectOfType<CaVR>();
+		inputManager = cavr.InputManger;//FindObjectOfType<VRPNInputManager>();
 	}
 	
 	// Update is called once per frame
