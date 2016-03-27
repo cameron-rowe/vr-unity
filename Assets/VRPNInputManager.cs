@@ -21,19 +21,23 @@ public class VRPNInputManager
     // Use this for initialization
 	public void Start(Config c) {
 
-		//data = new InputData();
+        //data = new InputData();
 
-        ButtonMap.Add("clear", "WiiMote0[0]"); // Home button
-        ButtonMap.Add("paint", "WiiMote0[3]"); // A button
-        ButtonMap.Add("rotate", "WiiMote0[16]"); // nunchuck-z button
-        ButtonMap.Add("boost", "WiiMote0[17]"); // nunchuck-c button
+        //ButtonMap.Add("clear", "WiiMote0[0]"); // Home button
+        //ButtonMap.Add("paint", "WiiMote0[3]"); // A button
+        //ButtonMap.Add("rotate", "WiiMote0[16]"); // nunchuck-z button
+        //ButtonMap.Add("boost", "WiiMote0[17]"); // nunchuck-c button
 
-        AnalogMap.Add("x", "WiiMote0[21]"); // nunchuck-y
-        AnalogMap.Add("z", "WiiMote0[22]"); // nunchuck-z
+        //AnalogMap.Add("x", "WiiMote0[21]"); // nunchuck-y
+        //AnalogMap.Add("z", "WiiMote0[22]"); // nunchuck-z
 
-        SixdofMap.Add("wand", "WiiMote0[0]"); // WiiMote0
-        SixdofMap.Add("view", "ShortGlasses[0]"); // short glasses
-        
+        //SixdofMap.Add("wand", "WiiMote0[0]"); // WiiMote0
+        //SixdofMap.Add("view", "ShortGlasses[0]"); // short glasses
+
+        //AnalogMap.Add("accelerator", "WiiMote0[69]");
+
+        SixdofMap.Add("wheel", "WiiMote0[0]");
+
         foreach(var button in ButtonMap.Values) {
             ButtonValues.Add(button, false);
         }
@@ -52,7 +56,7 @@ public class VRPNInputManager
     }
 
     // Update is called once per frame
-    void Update() {
+    public void Update() {
         string device;
         int channel;
 

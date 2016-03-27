@@ -41,21 +41,21 @@ vrpn = {
   type = "vrpn";
   input_name = "vrpn";
   buttons = {
-    "WiiMote0@projector.cse.unr.edu";
+    --"WiiMote0@projector.cse.unr.edu";
   };
   analogs = {
-    "WiiMote0@projector.cse.unr.edu";
+    --"WiiMote0@projector.cse.unr.edu";
   };
   sixdofs = {
     "WiiMote0@tracker.rd.unr.edu";
-    "ShortGlasses@tracker.rd.unr.edu";
+    --"ShortGlasses@tracker.rd.unr.edu";
   };
 };
 
 master = {
-  hostname = "hpcvis1";
-  ssh = "hpcvis1";--"chase@" .. HOSTNAME;
-  address = "tcp://hpcvis1:8000";
+  hostname = HOSTNAME;--"hpcvis10";
+  ssh = HOSTNAME;--"hpcvis10";--"chase@" .. HOSTNAME;
+  address = HOSTNAME;--"tcp://hpcvis1:8000";
   plugins = {
 --    x11_renderer = x11_renderer;
     vrpn = vrpn;
@@ -86,6 +86,6 @@ other = {
 
 machines = {
   master=master;
-  other = other;
+  --other = other;
   --self3 = others2;
 };

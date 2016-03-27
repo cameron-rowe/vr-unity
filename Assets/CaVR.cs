@@ -23,7 +23,7 @@ public class CaVR : MonoBehaviour {
 
 		UnityEngine.Debug.Log(Environment.GetCommandLineArgs()[0]);
 		if(config.IsMaster) {
-			if(!Application.isEditor || Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX) { 
+			if(!Application.isEditor && (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)) { 
 			    var machines = config.GetLuaStateValue("machines") as LuaTable;
                 foreach(var machineKey in machines.Keys) {
                     var machine = machineKey.ToString();
@@ -87,7 +87,7 @@ public class CaVR : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update() {
-	
+        InputManger.Update();
 	}
 
 	void Destroy() {
